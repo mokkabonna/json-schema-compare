@@ -39,7 +39,7 @@ console.log(isEqual) // => true
 
 Compare json schemas correctly.
 
-- Ignores sort for arrays that sort does not matter, like required, enum, type, anyOf, oneOf, anyOf, dependencies (if array)
+- Ignores sort for arrays where sort does not matter, like required, enum, type, anyOf, oneOf, anyOf, dependencies (if array)
 - Compares correctly type when array or string
 - Ignores duplicate values before comparing
 - For schemas and sub schemas `undefined`, `true` and `{}` are equal
