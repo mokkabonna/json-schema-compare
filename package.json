@@ -1,6 +1,6 @@
 {
   "name": "json-schema-compare",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Compare json schemas smarter.",
   "main": "src/index.js",
   "scripts": {
