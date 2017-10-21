@@ -26,7 +26,9 @@ var isEqual = compare({
     name: ['lastName', 'age']
   },
   properties: {
-    name: true
+    name: {
+      minLength: 0
+    }
   }
 }, {
   ignore: ['title']
