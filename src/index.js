@@ -104,7 +104,9 @@ var acceptsUndefined = [
 var schemaProps = ['additionalProperties', 'additionalItems', 'contains', 'propertyNames', 'not']
 
 function compare(a, b, options) {
-  options = defaults(options, {ignore: []})
+  options = defaults(options, {
+    ignore: []
+  })
 
   if (emptySchema(a) && emptySchema(b)) {
     return true
@@ -122,6 +124,10 @@ function compare(a, b, options) {
   }
 
   if ((a === undefined && b === false) || (b === undefined && a === false)) {
+    return false
+  }
+
+  if ((undef(a) && !undef(b)) || (!undef(a) && undef(b))) {
     return false
   }
 
