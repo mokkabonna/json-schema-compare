@@ -8,8 +8,7 @@ var isPlainObject = require('lodash/isPlainObject')
 var isBoolean = require('lodash/isBoolean')
 
 var normalizeArray = val => Array.isArray(val)
-  ? val
-  : [val]
+  ? val : [val]
 var undef = val => val === undefined
 var keys = obj => isPlainObject(obj) || Array.isArray(obj) ? Object.keys(obj) : []
 var has = (obj, key) => obj.hasOwnProperty(key)
@@ -38,7 +37,6 @@ function unsortedNormalizedArray(a, b) {
 
 function schemaGroup(a, b, key, compare) {
   var allProps = uniq(keys(a).concat(keys(b)))
-
   if (emptyObjUndef(a) && emptyObjUndef(b)) {
     return true
   } else if (emptyObjUndef(a) && keys(b).length) {
@@ -48,8 +46,14 @@ function schemaGroup(a, b, key, compare) {
   }
 
   return allProps.every(function(key) {
-    if (Array.isArray(a[key]) && Array.isArray(b[key])) {
+    var aVal = a[key]
+    var bVal = b[key]
+    if (Array.isArray(aVal) && Array.isArray(bVal)) {
       return isEqual(stringArray(a), stringArray(b))
+    } else if (Array.isArray(aVal) && !Array.isArray(bVal)) {
+      return false
+    } else if (Array.isArray(bVal) && !Array.isArray(aVal)) {
+      return false
     }
     return keyValEqual(a, b, key, compare)
   })
