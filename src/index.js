@@ -14,12 +14,11 @@ var keys = obj => isPlainObject(obj) || Array.isArray(obj) ? Object.keys(obj) : 
 var has = (obj, key) => obj.hasOwnProperty(key)
 var stringArray = arr => sortBy(uniq(arr))
 var undefEmpty = val => undef(val) || (Array.isArray(val) && val.length === 0)
-var keyValEqual = (a, b, key, compare) => b && has(b, key) && a && has(a, key) && compare(a[key], b[key])
 var undefAndZero = (a, b) => (undef(a) && b === 0) || (undef(b) && a === 0) || isEqual(a, b)
 var falseUndefined = (a, b) => (undef(a) && b === false) || (undef(b) && a === false) || isEqual(a, b)
 var emptySchema = schema => undef(schema) || isEqual(schema, {}) || schema === true
-var emptyObjUndef = schema => undef(schema) || isEqual(schema, {})
 var isSchema = val => undef(val) || isPlainObject(val) || val === true || val === false
+var propOrFake = (a, key) => undef(a) ? undefined : a[key]
 
 function undefArrayEqual(a, b) {
   if (undefEmpty(a) && undefEmpty(b)) {
@@ -37,17 +36,15 @@ function unsortedNormalizedArray(a, b) {
 
 function schemaGroup(a, b, key, compare) {
   var allProps = uniq(keys(a).concat(keys(b)))
-  if (emptyObjUndef(a) && emptyObjUndef(b)) {
+  if (emptySchema(a) && emptySchema(b)) {
     return true
-  } else if (emptyObjUndef(a) && keys(b).length) {
-    return false
-  } else if (emptyObjUndef(b) && keys(a).length) {
-    return false
   }
 
   return allProps.every(function(key) {
-    var aVal = a[key]
-    var bVal = b[key]
+    var aVal = propOrFake(a, key)
+    var bVal = propOrFake(b, key)
+
+    // TODO, remove when no longer support dependencies
     if (Array.isArray(aVal) && Array.isArray(bVal)) {
       return isEqual(stringArray(a), stringArray(b))
     } else if (Array.isArray(aVal) && !Array.isArray(bVal)) {
@@ -55,7 +52,8 @@ function schemaGroup(a, b, key, compare) {
     } else if (Array.isArray(bVal) && !Array.isArray(aVal)) {
       return false
     }
-    return keyValEqual(a, b, key, compare)
+
+    return compare(aVal, bVal)
   })
 }
 
@@ -127,15 +125,14 @@ function compare(a, b, options) {
     return a === b
   }
 
-  if ((a === undefined && b === false) || (b === undefined && a === false)) {
+  if ((a !== false && b === false) || (b !== false && a === false)) {
     return false
   }
 
-  if ((undef(a) && !undef(b)) || (!undef(a) && undef(b))) {
-    return false
-  }
+  var aKeys = isPlainObject(a) ? Object.keys(a) : []
+  var bKeys = isPlainObject(b) ? Object.keys(b) : []
 
-  var allKeys = uniq(Object.keys(a).concat(Object.keys(b)))
+  var allKeys = uniq([...aKeys, ...bKeys])
 
   if (options.ignore.length) {
     allKeys = allKeys.filter(k => options.ignore.indexOf(k) === -1)
@@ -150,8 +147,8 @@ function compare(a, b, options) {
   }
 
   return allKeys.every(function(key) {
-    var aValue = a[key]
-    var bValue = b[key]
+    var aValue = propOrFake(a, key)
+    var bValue = propOrFake(b, key)
 
     if (schemaProps.indexOf(key) !== -1) {
       return compare(aValue, bValue, options)

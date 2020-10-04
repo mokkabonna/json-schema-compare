@@ -30,7 +30,7 @@ describe('comparison', function() {
             minLength: 0
           }
         }
-      }, false, {
+      }, true, {
         ignore: ['title']
       })
     })
@@ -38,6 +38,7 @@ describe('comparison', function() {
     it('compares false and undefined', function() {
       compare(undefined, false, false)
     })
+
     it('compares required unsorted', function() {
       compare({
         required: ['test', 'rest']
@@ -45,6 +46,7 @@ describe('comparison', function() {
         required: ['rest', 'test', 'rest']
       }, true)
     })
+
     it('compares equal required empty array and undefined', function() {
       compare({
         required: []
@@ -54,11 +56,13 @@ describe('comparison', function() {
         required: ['fds']
       }, {}, false)
     })
+
     it('compares equal properties empty object and undefined', function() {
       compare({
         properties: {}
       }, {}, true)
     })
+
     it('compares properties', function() {
       compare({
         properties: {
@@ -74,16 +78,162 @@ describe('comparison', function() {
         }
       }, true)
     })
+
+    it('compares schema undefined and true', function() {
+      compare(true, undefined, true)
+    })
+
+    it('compares schema empty object and true', function() {
+      compare(true, {}, true)
+    })
+
+    it('compares sub schema with matching sub validators equal to undefined', function() {
+      compare({
+        properties: {
+          name: undefined
+        }
+      }, {
+        properties: {
+          name: {
+            minLength: 0
+          }
+        }
+      }, true)
+    })
+
+    it('compares sub schema with matching sub validators equal to missing', function() {
+      compare({
+        properties: {
+        }
+      }, {
+        properties: {
+          name: {
+            minLength: 0
+          }
+        }
+      }, true)
+    })
+
+    it('compares sub schema with matching sub validators equal to no properties', function() {
+      compare({}, {
+        properties: {
+          name: {
+            minLength: 0
+          }
+        }
+      }, true)
+
+      compare(true, {
+        properties: {
+          name: {
+            minLength: 0
+          }
+        }
+      }, true)
+
+      compare(undefined, {
+        properties: {
+          name: {
+            minLength: 0,
+            minItems: 0
+          }
+        }
+      }, true)
+    })
+
+    it('compares sub schema with matching sub validators equal to no properties', function() {
+      compare({
+        properties: {
+          name: false
+        }
+      }, {
+        properties: {
+          name: {
+            minLength: 0
+          }
+        }
+      }, false)
+    })
+
     it('compares equal patternProperties empty object and undefined', function() {
       compare({
         patternProperties: {}
       }, {}, true)
     })
+
+    it('compares patternProperties with regular property as false', function() {
+      compare({
+        patternProperties: {
+          '.+': {
+            minLength: 9
+          }
+        }
+      }, {
+        properties: {
+          name: {
+            minLength: 9
+          }
+        }
+      }, false)
+    })
+
+    it('compares equal patternProperties', function() {
+      compare({
+        patternProperties: {
+          '.+': {
+            minLength: 9
+          }
+        }
+      }, {
+        patternProperties: {
+          '.+': {
+            minLength: 9
+          }
+        }
+      }, true)
+    })
+
+    it('compares equal patternProperties', function() {
+      compare({
+        patternProperties: {
+          '.+': {
+            minLength: 0
+          },
+          '..+': {
+            minLength: 0
+          },
+          '...+': {
+            minLength: 0
+          }
+        }
+      }, {
+        patternProperties: {
+          '.+': {},
+          '..+': true
+        }
+      }, true)
+    })
+
+    it('compares patternProperties, subschema false', function() {
+      compare({
+        patternProperties: {
+          '.+': false
+        }
+      }, {
+        patternProperties: {
+          '.+': {
+            minLength: 0
+          }
+        }
+      }, false)
+    })
+
     it('compares equal dependencies empty object and undefined', function() {
       compare({
         dependencies: {}
       }, {}, true)
     })
+
     it('compares type unsorted', function() {
       compare({
         type: ['string', 'array']
@@ -101,12 +251,14 @@ describe('comparison', function() {
         type: ['string']
       }, true)
     })
+
     it('compares equal an empty schema, true and undefined', function() {
       compare({}, true, true)
       compare({}, undefined, true)
       compare(false, false, true)
       compare(true, true, true)
     })
+
     it('ignores any in ignore list', function() {
       compare({
         title: 'title'
@@ -123,6 +275,7 @@ describe('comparison', function() {
         type: ['string']
       }, false)
     })
+
     it('sorts anyOf before comparing', function() {
       compare({
         anyOf: [
@@ -203,6 +356,7 @@ describe('comparison', function() {
         ]
       }, true)
     })
+
     it('sorts allOf before comparing', function() {
       compare({
         allOf: [
@@ -283,6 +437,7 @@ describe('comparison', function() {
         ]
       }, true)
     })
+
     it('sorts oneOf before comparing', function() {
       compare({
         oneOf: [
@@ -363,6 +518,7 @@ describe('comparison', function() {
         ]
       }, true)
     })
+
     it('compares enum unsorted', function() {
       compare({
         enum: ['abc', '123']
@@ -370,6 +526,7 @@ describe('comparison', function() {
         enum: ['123', 'abc', 'abc']
       }, true)
     })
+
     it('compares dependencies value if array unsorted', function() {
       compare({
         dependencies: {
@@ -381,6 +538,7 @@ describe('comparison', function() {
         }
       }, true)
     })
+
     it('compares items SORTED', function() {
       compare({
         items: [true, false]
@@ -394,21 +552,25 @@ describe('comparison', function() {
         items: [true, false]
       }, true)
     })
+
     it('compares equal uniqueItems false and undefined', function() {
       compare({
         uniqueItems: false
       }, {}, true)
     })
+
     it('compares equal minLength undefined and 0', function() {
       compare({
         minLength: 0
       }, {}, true)
     })
+
     it('compares equal minItems undefined and 0', function() {
       compare({
         minItems: 0
       }, {}, true)
     })
+
     it('compares equal minProperties undefined and 0', function() {
       compare({
         minProperties: 0
