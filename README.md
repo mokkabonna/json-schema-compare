@@ -13,7 +13,7 @@ var compare = require('json-schema-compare')
 var isEqual = compare({
   title: 'title 1',
   type: ['object'],
-  uniqueItems: false,
+  uniqueItems: false, // false is same as undefined
   dependencies: {
     name: ['age', 'lastName']
   },
@@ -35,6 +35,16 @@ var isEqual = compare({
 })
 
 console.log(isEqual) // => true
+```
+
+In the example above the name with `minLength: 0`, it is the same as all the all the following:
+```json
+{ properties: { name : { minLength: undefined } } }
+{ properties: { name: {} } }
+{ properties: { name: true } }
+{ properties: { name: undefined } }
+{ properties: {} }
+{ }
 ```
 
 Compare json schemas correctly.
